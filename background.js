@@ -1,4 +1,4 @@
-//API key from VirusTotal
+//replace with API key from VirusTotal
 const VT_API_KEY = 'VT_API_KEY';
 const VT_API_URL_BASE = 'https://www.virustotal.com/api/v3/urls';
 
