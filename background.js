@@ -1,8 +1,8 @@
 //replace API_KEY with real API from VirusTotal
-const VT_API_KEY = 'API_KEY';
+const VT_API_KEY = 'edcde20221c769d2802bf3cee5754e41864ac6ba8d051c539b3447e6d3a32bd3';
 const VT_API_URL_BASE = 'https://www.virustotal.com/api/v3/urls';
 
-// --- Helper function to show alerts on the active tab ---
+// Helper function to show alerts on the active tab ---
 function showAlert(tabId, message) {
   chrome.scripting.executeScript({
     target: { tabId: tabId },
@@ -13,7 +13,7 @@ function showAlert(tabId, message) {
   }).catch(err => console.error("Failed to inject script:", err)); // Basic error handling for injection
 }
 
-// --- Function to check URL with VirusTotal ---
+// Function to check URL with VirusTotal ---
 async function checkUrlWithVirusTotal(tabId, url) {
   if (!VT_API_KEY) {
     console.error("VirusTotal API Key not set in background.js");
@@ -21,8 +21,7 @@ async function checkUrlWithVirusTotal(tabId, url) {
     return;
   }
 
-  // VirusTotal API v3 requires a URL identifier which is the base64 representation
-  // of the URL without padding '=' characters.
+  // encode URL to base64 representation
   const urlId = btoa(url).replace(/=/g, '');
   const requestUrl = `${VT_API_URL_BASE}/${urlId}`;
 
@@ -69,19 +68,17 @@ async function checkUrlWithVirusTotal(tabId, url) {
       if (maliciousCount > 0 || suspiciousCount > 0) {
         showAlert(tabId, `⚠️ VirusTotal Warning! ⚠️\n\nURL: ${url}\n\nDetected as potentially RISKY:\n- Malicious: ${maliciousCount}\n- Suspicious: ${suspiciousCount}`);
       } else {
-        // Optional: Alert for safe sites (can be annoying)
+        // Alert for safe sites (can be annoying)
         showAlert(tabId, `✅ VirusTotal Check:\n\nURL: ${url}\n\nAppears SAFE (M:${maliciousCount}, S:${suspiciousCount}, H:${harmlessCount})`);
         console.log(`URL appears safe according to VirusTotal: ${url}`);
       }
     } else {
        console.log(`No analysis stats found in VT response for ${url}`);
-       // This might happen if the URL was submitted but never analyzed, or if the response format is unexpected.
+       // This might happen if the URL was submitted but never analyzed
     }
 
   } catch (error) {
     console.error('Error fetching VirusTotal data:', error);
-    // Optional: Alert user about fetch failure
-    // showAlert(tabId, `Error contacting VirusTotal for ${url}`);
   }
 }
 
